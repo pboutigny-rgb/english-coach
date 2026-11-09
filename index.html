@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0f1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="English Coach">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<title>English Coach</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body class="home">
+
+<div id="app">
+
+  <main id="tab-home" class="tab active">
+    <h1>English Coach</h1>
+    <p class="sub">Conversation orale mains libres, avec des voix et des personnages variés.</p>
+    <div id="keyBanner" class="banner" hidden>Ajoute ta clé Gemini gratuite pour commencer. <button data-goto="settings">Ouvrir les réglages</button><div id="keyWizard"></div></div>
+
+    <h2>Mesurer mon niveau</h2>
+    <div class="note">
+      <h3>Test de niveau (environ 12 minutes)</h3>
+      <p class="sub">Un examinateur suit toujours le même protocole (expression orale puis compréhension) et note ton anglais selon les critères du CECRL. À refaire toutes les 2 à 4 semaines, avec un casque et au calme.</p>
+      <button class="btn pri" id="testBtn">Passer le test de niveau</button>
+    </div>
+
+    <h2>Langue à travailler</h2>
+    <div class="field"><div class="seg" data-key="lang" data-opts="en|🇬🇧 English,es|🇪🇸 Español,de|🇩🇪 Deutsch,it|🇮🇹 Italiano"></div></div>
+
+    <h2>Mon interlocuteur</h2>
+    <div id="compWrap"></div>
+
+    <h2>De quoi parler ?</h2>
+    <div id="topics" class="chips"></div>
+    <div class="field">
+      <label for="customTopic">Un sujet précis (facultatif)</label>
+      <input type="text" id="customTopic" placeholder="Ex : préparer une réunion avec un fournisseur" autocomplete="off">
+    </div>
+
+    <h2>Séance</h2>
+    <div class="field"><label>Niveau visé</label><div class="seg" data-key="level" data-opts="B1|B1,B2|B2,C1|C1"></div></div>
+    <div class="field"><label>Débit de parole</label><div class="seg" data-key="speed" data-opts="slow|Lent,natural|Naturel,fast|Rapide"></div></div>
+    <div class="field"><label>Longueur des réponses du personnage</label><div class="seg" data-key="talk" data-opts="auto|Adaptées,short|Courtes,normal|Développées"></div></div>
+    <div class="field"><label>Corrections</label><div class="seg" data-key="correction" data-opts="recast|Discrètes,end|À la fin,coach|Après chaque réponse"></div></div>
+
+  </main>
+
+  <main id="tab-translate" class="tab">
+    <h1>Traduire</h1>
+    <p class="sub">Interprète en direct avec le micro et le haut-parleur du téléphone.</p>
+    <div class="field"><label for="trLang">Autre langue</label><select id="trLang" data-key="trLang"></select></div>
+    <div class="field"><label>Mode</label><div class="seg" data-key="trDir" data-opts="both|Interprète,fr2x|FR vers autre,x2fr|Autre vers FR"></div></div>
+    <p class="sub" id="trHelp"></p>
+    <div class="field"><label for="trVoice">Voix de l'interprète</label><select id="trVoice" data-key="trVoice"></select></div>
+    <button class="big" id="trStart" style="margin:18px 0 8px">Démarrer la traduction</button>
+    <div class="note">
+      <ul>
+        <li>Avec le haut-parleur du téléphone, garde l'anti-écho activé dans les réglages : le micro se coupe pendant que l'interprète parle. Avec un casque, tu peux le désactiver.</li>
+        <li>Parlez par phrases et marquez une courte pause : la traduction suit à chaque pause.</li>
+        <li>Rien n'est enregistré dans le carnet. La qualité varie selon la langue, et il ne faut pas se fier à cet outil pour des sujets médicaux, juridiques ou contractuels.</li>
+      </ul>
+    </div>
+  </main>
+
+  <main id="tab-notes" class="tab">
+    <h1>Carnet</h1>
+    <p class="sub">Corrections et expressions notées à la fin de chaque séance.</p>
+    <div class="row"><button class="btn" id="copyNotes">Copier tout</button><button class="btn danger" id="clearNotes">Effacer</button></div>
+    <div id="notesList"></div>
+  </main>
+
+  <main id="tab-progress" class="tab">
+    <h1>Progrès</h1>
+    <p class="sub">Niveau estimé selon le CECRL et évolution dans le temps.</p>
+    <div class="field"><label>Langue</label><div class="seg" data-key="lang" data-opts="en|🇬🇧 English,es|🇪🇸 Español,de|🇩🇪 Deutsch,it|🇮🇹 Italiano"></div></div>
+    <div class="field"><label>Période affichée</label><div class="seg" data-key="period" data-opts="7|7 j,30|30 j,90|90 j,all|Tout,custom|Dates"></div></div>
+    <div class="row" id="customDates" hidden><input type="date" id="pFrom"><input type="date" id="pTo"></div>
+    <div id="progressBody"></div>
+    <div class="row"><button class="btn" id="copyReport">Copier le rapport</button></div>
+  </main>
+
+  <main id="tab-qr" class="tab">
+    <h2>QR</h2>
+    <div id="qrBox"></div>
+  </main>
+
+  <main id="tab-settings" class="tab">
+    <h1>Réglages</h1>
+
+    <h2>Connexion</h2>
+    <div class="field">
+      <label for="apiKey">Clé API Gemini (gratuite)</label>
+      <div id="keyWizardSettings"></div>
+      <input type="password" id="apiKey" data-key="apiKey" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="AIza...">
+      <small class="sub">Crée-la sur aistudio.google.com/apikey. Elle reste uniquement dans ce téléphone.</small>
+    </div>
+    <div class="field">
+      <label for="model">Modèle vocal</label>
+      <input type="text" id="model" data-key="model" list="models" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <datalist id="models"></datalist>
+    </div>
+
+    <h2>Toi</h2>
+    <div class="field"><label for="uname">Prénom (pour que les personnages t'appellent par ton prénom)</label><input type="text" id="uname" data-key="name" autocomplete="off"></div>
+    <div class="field"><label for="about">À propos de toi (métier, centres d'intérêt, famille, contexte)</label><textarea id="about" data-key="about" placeholder="Ex : directeur des opérations dans l'industrie, père de famille, j'aime la musique..."></textarea></div>
+
+    <h2>Audio mains libres</h2>
+    <div class="row"><div>Anti-écho<small>Coupe le micro pendant que le personnage parle. À désactiver avec un casque pour pouvoir l'interrompre.</small></div><input type="checkbox" class="sw" data-key="halfDuplex"></div>
+    <div class="field"><label for="silenceMs">Délai de base avant que ton interlocuteur réponde : <b id="silenceVal"></b> ms. Il l'allonge seul quand tu hésites ou cherches tes mots.</label><input type="range" id="silenceMs" data-key="silenceMs" min="500" max="2500" step="100"></div>
+    <div class="row"><div>Mode bilingue<small>Si tu parles français, le personnage répond en français, puis revient à l'anglais. Si tu parles anglais, il répond en anglais. Tu peux aussi demander "what's the French for..." ou "comment dit-on...".</small></div><input type="checkbox" class="sw" data-key="bilingual"></div>
+    <div class="row"><div>Recherche web en direct<small>Faits d'actualité à jour. Indisponible avec une clé gratuite : l'appli le désactive seule si Google refuse.</small></div><input type="checkbox" class="sw" data-key="search"></div>
+    <div class="row"><div>Second avis sur les tests de niveau<small>Un modèle texte indépendant relit la transcription et compare sa notation à celle de l'examinateur.</small></div><input type="checkbox" class="sw" data-key="secondOpinion"></div>
+    <div class="field"><label for="textModel">Modèle texte du second avis</label><input type="text" id="textModel" data-key="textModel" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+    <div class="row"><div>Sous-titres pendant la séance</div><input type="checkbox" class="sw" data-key="captions"></div>
+
+    <h2>Mémoire de ton interlocuteur</h2>
+    <div class="row"><div>Mémoire activée<small>Après chaque séance, il retient ce qui compte pour mieux te connaître. Tout est stocké dans ce téléphone et tu peux tout modifier ou effacer.</small></div><input type="checkbox" class="sw" data-key="memory"></div>
+    <div id="memBox"></div>
+
+    <h2>Profil</h2>
+    <div id="profileBox"></div>
+
+    <h2>Conseils</h2>
+    <div class="note">
+      <ul>
+        <li>Garde l'écran allumé pendant la séance et le téléphone branché. L'application l'empêche de s'éteindre.</li>
+        <li>Casque ou oreillettes Bluetooth recommandés. Sur iPhone le haut-parleur est faible quand le micro est actif.</li>
+        <li>Dis simplement ce que tu veux : "let's talk about music", "slow down", "say that again", "talk to someone else", "correct me now", "let's wrap up". En français : "je n'ai pas compris, explique-moi ce mot", "comment dit-on ... en anglais ?".</li>
+      </ul>
+    </div>
+  </main>
+
+  <div id="startbar"><button class="big" id="startBtn">Commencer la séance</button></div>
+
+  <nav id="tabbar">
+    <button data-tab="home" class="on"><span>💬</span>Séance</button>
+    <button data-tab="translate"><span>🌐</span>Traduire</button>
+    <button data-tab="notes"><span>📒</span>Carnet</button>
+    <button data-tab="progress"><span>📈</span>Progrès</button>
+    <button data-tab="qr" id="qrTabBtn"><span>🔳</span>QR</button>
+    <button data-tab="settings"><span>⚙️</span>Réglages</button>
+  </nav>
+</div>
+
+<section id="session" hidden>
+  <div id="sHead"><div id="sName"></div><div id="sState"></div></div>
+  <div id="orbWrap"><div id="orb" class="wait"></div></div>
+  <div id="err" hidden></div>
+  <div id="caps"></div>
+  <div id="ctrl">
+    <button id="bPause">🎙️ Pause</button>
+    <button id="bCaps">💬 Sous-titres</button>
+    <button id="bDark">🌙 Écran noir</button>
+    <button id="bEnd" class="end">⏹ Terminer</button>
+  </div>
+  <button id="quit">Quitter sans bilan</button>
+</section>
+
+<div id="blackout" hidden></div>
+<div id="toast"></div>
+<script src="edition.js"></script>
+<script src="qrcode.js"></script>
+<script src="progress.js"></script>
+<script src="companion.js"></script>
+<script src="profile.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
